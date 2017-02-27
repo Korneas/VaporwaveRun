@@ -5,31 +5,35 @@ import processing.core.PApplet;
 public class Tiempo {
 
 	private PApplet app;
-
-	// Objeto para contabilizar tiempo y que no se vea afectado por un frame
-	// rate
-	// Declaración de las variables que ejecutaran el tiempo
 	int comenzar = 0, parar = 0;
 	boolean reproducir = false;
 
+	/*
+	 * Objeto para medir el tiempo con millis, utilizando PApplet
+	 */
 	public Tiempo(PApplet app) {
 		this.app = app;
-		// TODO Auto-generated constructor stub
 	}
 
-	// Si el reloj comienza
+	/*
+	 * Empezar el conteo - Vuelve a empezar el conteo
+	 */
 	void empezar() {
 		comenzar = app.millis();
 		reproducir = true;
 	}
 
-	// Si el reloj se detiene
+	/*
+	 * Detiene el reloj
+	 */
 	void detener() {
 		parar = app.millis();
 		reproducir = false;
 	}
 
-	// Reproducira el tiempo que se este pasando
+	/*
+	 * Muestra el tiempo que esta pasando en el momento
+	 */
 	int timepoReproducido() {
 		int tiempo;
 		if (reproducir) {
@@ -40,12 +44,16 @@ public class Tiempo {
 		return tiempo;
 	}
 
-	// Retorna los segundos reproducidos
+	/*
+	 * Devuelve los segundos reproducidos
+	 */
 	int second() {
 		return (timepoReproducido() / 1000) % 60;
 	}
 
-	// Retorna los minutos reproducidos
+	/*
+	 * Devuelve los minutos reproducidos
+	 */
 	int minute() {
 		return (timepoReproducido() / (1000 * 60)) % 60;
 	}
