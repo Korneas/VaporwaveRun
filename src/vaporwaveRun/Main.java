@@ -8,12 +8,12 @@ public class Main extends PApplet{
 	
 	public static void main(String[] args) {
 		System.setProperty("java.net.preferIPv4Stack", "true");
-		PApplet.main("triquiRedes.Main");
+		PApplet.main("vaporwaveRun.Main");
 	}
 	
 	@Override
 	public void settings(){
-		size(600,600);
+		size(1000,700);
 	}
 	
 	@Override
