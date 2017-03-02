@@ -5,14 +5,17 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 public abstract class Elemento {
-	private PApplet app;
-	private PVector pos;
-	private PImage style;
+	protected PApplet app;
+	protected PVector pos, vel;
+	protected PImage style;
 
-	private float x, y, vel;
+	protected float x, y;
 
-	public Elemento(PApplet app) {
+	public Elemento(PApplet app, PImage style) {
 		this.app = app;
+		this.style = style;
+
+		pos = new PVector(x, y);
 	}
 
 	/*
@@ -27,5 +30,15 @@ public abstract class Elemento {
 	 * Metodo abstracto que define el movimiento de los elementos
 	 */
 	public abstract void mover();
+
+	/*
+	 * Metodo abstracto para saber si se coliciono y restar puntuacion
+	 */
+	public boolean colision(PVector rad) {
+		if (PVector.dist(rad, pos) < 120) {
+			return true;
+		}
+		return false;
+	}
 
 }
