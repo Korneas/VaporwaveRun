@@ -15,8 +15,8 @@ public class Logica implements Observer {
 	private Comunicacion c;
 	private int pantalla;
 
-	private PImage logo, fondoM, fondoM2, fondoG, fondoG2;
-	private float xFondo, xFondo2;
+	private PImage logo, fondoM, fondoG;
+	private float xFondoM, xFondoM2, xFondoG, xFondoG2;
 	private PFont texto;
 
 	private ArrayList<Elemento> elem;
@@ -33,12 +33,13 @@ public class Logica implements Observer {
 		logo = app.loadImage("data/VaporwaveLet.png");
 
 		fondoM = app.loadImage("data/montana.png");
-		fondoM2 = fondoM;
 
 		fondoG = app.loadImage("data/neogalaxy.jpg");
-		fondoG2 = fondoG;
 
 		texto = app.loadFont("data/Pixeled-24.vlw");
+
+		xFondoM2 = 2127;
+		xFondoG2 = 2137;
 	}
 
 	public void pintar() {
@@ -58,18 +59,35 @@ public class Logica implements Observer {
 	}
 
 	private void inicio() {
-		if (xFondo >= -2200) {
-			xFondo -= 1.5;
+		if (xFondoM >= -2136) {
+			xFondoM -= 2;
 		} else {
-			xFondo = 0;
+			xFondoM = 2127;
 		}
-		xFondo2--;
 
-		System.out.println(xFondo);
+		if (xFondoM2 >= -2136) {
+			xFondoM2 -= 2;
+		} else {
+			xFondoM2 = 2127;
+		}
+		
+		if (xFondoG >= -2136) {
+			xFondoG --;
+		} else {
+			xFondoG = 2136;
+		}
+		
+		if (xFondoG2 >= -2136) {
+			xFondoG2 --;
+		} else {
+			xFondoG2 = 2136;
+		}
 
 		app.imageMode(0);
-		app.image(fondoG, xFondo, 0);
-		app.image(fondoM, xFondo2, 0);
+		app.image(fondoG, xFondoM, 0);
+		app.image(fondoG, xFondoM2, 0);
+		app.image(fondoM, xFondoG, 0);
+		app.image(fondoM, xFondoG2, 0);
 
 		app.imageMode(3);
 		app.image(logo, 500, 350);
@@ -91,7 +109,7 @@ public class Logica implements Observer {
 		}
 
 		if (arg instanceof Movement) {
-
+			System.out.println("Me llego el mover");
 		}
 	}
 }

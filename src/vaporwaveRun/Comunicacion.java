@@ -128,7 +128,7 @@ public class Comunicacion extends Observable implements Runnable {
 							
 							if (deserialize(dPacket.getData()) instanceof Movement) {
 								setChanged();
-								notifyObservers(deserialize(dPacket.getData()));
+								notifyObservers((Movement)deserialize(dPacket.getData()));
 								clearChanged();
 							}
 						}
@@ -154,7 +154,7 @@ public class Comunicacion extends Observable implements Runnable {
 			for (int i = 1; i < 255; i++) {
 				String host = hostIP + "." + i;
 				if (InetAddress.getByName(host).isReachable(espera)) {
-					System.out.println(host + " is reachable");
+					System.out.println(host + " es alcanzable");
 					
 					setChanged();
 					notifyObservers(host);
