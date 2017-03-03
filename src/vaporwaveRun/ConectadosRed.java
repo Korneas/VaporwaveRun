@@ -10,6 +10,10 @@ public class ConectadosRed extends Observable implements Runnable {
 	public ConectadosRed() {
 	}
 
+	/*
+	 * Metodo sobreescrito de Runnable para conocer ips conectadas al servidor que provee red wifi o por cable
+	 * @see java.lang.Runnable#run()
+	 */
 	@Override
 	public void run() {
 		try {

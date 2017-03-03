@@ -33,8 +33,11 @@ public abstract class Elemento {
 	 */
 	public abstract void mover();
 
-	/*
-	 * Metodo abstracto para saber si se coliciono y restar puntuacion
+	/**
+	 * Metodo para conocer si el elemento colisiono con algo
+	 * @param xA float
+	 * @param yA flaot
+	 * @return boolean
 	 */
 	public boolean colision(float xA, float yA) {
 		if (PApplet.dist(xA, yA, x, y) < 80) {

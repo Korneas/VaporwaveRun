@@ -33,6 +33,10 @@ public class Comunicacion extends Observable implements Runnable {
 
 	}
 
+	/**
+	 * Metodo para hacer autoidentificacion en un grupo Multicast
+	 * @throws IOException
+	 */
 	private void autoID() throws IOException {
 		try {
 			enviar(new Mensaje("Hola soy nuevo"), GROUP_ADDRESS);
@@ -62,6 +66,12 @@ public class Comunicacion extends Observable implements Runnable {
 		}
 	}
 
+	/**
+	 * Metodo para enviar paquetes mediante conexion UDP
+	 * @param info Object
+	 * @param ipAdrs String
+	 * @throws IOException
+	 */
 	public void enviar(Object info, String ipAdrs) throws IOException {
 		byte[] data = serialize(info);
 		InetAddress host = InetAddress.getByName(ipAdrs);
@@ -70,6 +80,11 @@ public class Comunicacion extends Observable implements Runnable {
 		mSocket.send(dPacket);
 	}
 
+	/**
+	 * Metodo para recibir paquetes mediante conexion UDP y retornar el paquete recibido
+	 * @return DatagramPacket
+	 * @throws IOException
+	 */
 	private DatagramPacket recibir() throws IOException {
 		byte[] data = new byte[1024];
 		DatagramPacket dPacket = new DatagramPacket(data, data.length);
@@ -77,6 +92,11 @@ public class Comunicacion extends Observable implements Runnable {
 		return dPacket;
 	}
 
+	/**
+	 * Metodo para serializar un objeto
+	 * @param o Object
+	 * @return byte[]
+	 */
 	private byte[] serialize(Object o) {
 		byte[] info = null;
 		try {
@@ -92,6 +112,11 @@ public class Comunicacion extends Observable implements Runnable {
 		return info;
 	}
 
+	/**
+	 * Metodo para deserializar un byte array
+	 * @param b byte[]
+	 * @return Object
+	 */
 	private Object deserialize(byte[] b) {
 		Object data = null;
 		try {

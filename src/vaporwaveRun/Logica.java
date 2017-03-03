@@ -19,7 +19,7 @@ public class Logica implements Observer {
 	private int pantalla;
 	private boolean cambiarPantalla;
 
-	private PImage logo, fondoM, fondoG, fondoFinal;
+	private PImage logo, fondoM, fondoG, fondoFinal, instruc;
 	private float xFondoM, xFondoM2, xFondoG, xFondoG2;
 	private PFont texto;
 
@@ -29,9 +29,12 @@ public class Logica implements Observer {
 
 	private ArrayList<Elemento> elem;
 
-	private int puntuacion, al;
-	private boolean end, alOn;
+	private int puntuacion, mult;
 
+	/**
+	 * Constructor de Logica el cual genera toda la interaccion de la animacion
+	 * @param app PApplet
+	 */
 	public Logica(PApplet app) {
 		this.app = app;
 
@@ -50,12 +53,12 @@ public class Logica implements Observer {
 		fondoM = app.loadImage("data/montana.png");
 		fondoG = app.loadImage("data/neogalaxy.jpg");
 		fondoFinal = app.loadImage("data/FondoFinal.png");
+		instruc = app.loadImage("data/insturc.png");
 
 		texto = app.loadFont("data/Pixeled-24.vlw");
 
 		xFondoM2 = 2127;
 		xFondoG2 = 2137;
-		al = 256;
 
 		as = new Astronauta(app, app.loadImage("data/Personaje.png"));
 
@@ -66,8 +69,13 @@ public class Logica implements Observer {
 		elementos[2] = app.loadImage("data/Windows.png");
 
 		elem = new ArrayList<Elemento>();
+
+		mult = 1;
 	}
 
+	/**
+	 * Metodo para pintar todas las interfaces
+	 */
 	public void pintar() {
 		app.background(255);
 
@@ -75,20 +83,6 @@ public class Logica implements Observer {
 
 		if (app.frameCount % 60 == 0) {
 			cambiarPantalla = true;
-		}
-
-		if (pantalla < 2) {
-			if (al < 0) {
-				alOn = true;
-			} else if (al > 255) {
-				alOn = false;
-			}
-
-			if (alOn) {
-				al += 5;
-			} else if (!alOn) {
-				al -= 5;
-			}
 		}
 
 		switch (pantalla) {
@@ -108,6 +102,9 @@ public class Logica implements Observer {
 
 	}
 
+	/**
+	 * Metodo par pintar el fondo que es continuo e infinito
+	 */
 	private void fondo() {
 		if (xFondoM >= -2136) {
 			xFondoM -= 2;
@@ -143,27 +140,40 @@ public class Logica implements Observer {
 		app.image(fondoM, xFondoG2, 0);
 	}
 
+	/**
+	 * Pantalla de inicio
+	 */
 	private void inicio() {
 		app.imageMode(3);
 		app.image(logo, 500, 350);
 
-		app.tint(255, al);
 		app.fill(50, 0, 100);
 		app.textAlign(PApplet.RIGHT);
 		app.textFont(texto);
 		app.text("Presione -Espacio-\n para empezar", 970, 650);
-		app.tint(255);
 	}
 
+	/*
+	 * Pantalla de instrucciones
+	 */
 	private void instrucciones() {
-		app.tint(255, al);
 		app.fill(50, 0, 100);
 		app.textAlign(PApplet.RIGHT);
 		app.textFont(texto);
 		app.text("Presione -Espacio-\n para continuar", 970, 650);
-		app.tint(255);
+		app.textAlign(PApplet.CENTER);
+		app.textSize(32);
+		app.text("Instrucciones", 500, 120);
+		app.imageMode(3);
+		app.image(instruc, 500, 350);
+		app.textSize(12);
+		app.text("¡Te mueves utilizando tu dispositivo Android!\nTienes un minuto para lograr la mejor puntuacion", 500,
+				470);
 	}
 
+	/*
+	 * Pantalla de juego
+	 */
 	private void game() {
 		app.fill(255);
 		app.noStroke();
@@ -173,56 +183,83 @@ public class Logica implements Observer {
 		app.textFont(texto);
 		app.textSize(16);
 		app.text("Puntuacion\n" + puntuacion, 500, 50);
-		
+
+		app.textAlign(PApplet.RIGHT);
+		app.textSize(24);
+		app.text(PApplet.nf(time.minute(), 1) + ":" + PApplet.nf(time.second(), 2), 900, 50);
+
 		app.textAlign(PApplet.LEFT);
 		app.textSize(24);
-		app.text(PApplet.nf(time.minute(),1)+":"+PApplet.nf(time.second(),2), 900, 50);
+		app.text("x" + mult, 100, 50);
 
 		if (elem.size() > 0) {
 			for (int i = 0; i < elem.size(); i++) {
 				elem.get(i).pintar();
 				elem.get(i).mover();
 
-				if (elem.get(i).colision(as.getX(),as.getY())) {
+				if (elem.get(i).colision(as.getX(), as.getY())) {
 					if (elem.get(i) instanceof Arizona) {
-						puntuacion += 200;
+						mult++;
 						elem.remove(i);
-					}
-
-					if (elem.get(i) instanceof Gameboy) {
-						puntuacion -= 150;
+					} else if (elem.get(i) instanceof Gameboy) {
+						puntuacion -= 50;
+						mult = 1;
 						elem.remove(i);
-					}
-
-					if (elem.get(i) instanceof Windows) {
-						puntuacion -= 500;
+					} else if (elem.get(i) instanceof Windows) {
+						puntuacion -= 100;
+						mult = 1;
 						elem.remove(i);
 					}
 				}
-				
-				if(elem.get(i).getX()<-100){
+
+				if (elem.get(i).getX() < -100) {
 					elem.remove(i);
 				}
 			}
 		}
 
 		as.pintar();
-		as.mover();
 
 		if (app.frameCount % 5 == 0) {
-			puntuacion++;
+			puntuacion += mult;
+		}
+
+		if (puntuacion < 0) {
+			pantalla = 3;
+			time.detener();
 		}
 
 		if (time.minute() >= 1) {
 			pantalla = 3;
+			time.detener();
 		}
 
 	}
 
+	/*
+	 * Pantalla de resultados
+	 */
 	private void resultados() {
+		app.fill(50,0,100);
+		app.textAlign(PApplet.CENTER);
+		app.textSize(38);
+		app.text("Resultados", 500, 180);
+		
+		app.fill(0,0,200);
 
+		app.textAlign(PApplet.RIGHT);
+		app.textSize(20);
+		app.text("Tiempo:\n\nPuntuacion:\n\nMax multi:", 500, 300);
+
+		app.textAlign(PApplet.LEFT);
+		app.textSize(20);
+		app.text(PApplet.nf(time.minute(), 1) + ":" + PApplet.nf(time.second(), 2) + "\n\n" + puntuacion + "\n\nx" + mult,
+				500, 300);
 	}
 
+	/*
+	 * Metodo para utilizar la barra espaciadora para ir entre pantallas
+	 */
 	public void tecla() {
 		if (app.keyPressed) {
 			if (app.key == ' ') {
@@ -232,7 +269,7 @@ public class Logica implements Observer {
 				}
 
 				if (cambiarPantalla && pantalla == 1) {
-					pantalla = 2;
+					pantalla = 3;
 					cambiarPantalla = false;
 					time.empezar();
 					Thread nt = new Thread(cR);
@@ -242,6 +279,11 @@ public class Logica implements Observer {
 		}
 	}
 
+	/**
+	 * Metodo implementado e Observer para conocer las notificaciones de los observable que este tiene
+	 * @param o Observable
+	 * @param arg Object
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 		if (arg instanceof String) {
@@ -266,9 +308,9 @@ public class Logica implements Observer {
 		if (arg instanceof Movement) {
 			Movement mov = (Movement) arg;
 			if (mov.getContenido().contains("up")) {
-				as.setY(as.getY()-5);
+				as.setY(as.getY() - 15);
 			} else if (mov.getContenido().contains("down")) {
-				as.setY(as.getY()+5);
+				as.setY(as.getY() + 15);
 			}
 		}
 	}

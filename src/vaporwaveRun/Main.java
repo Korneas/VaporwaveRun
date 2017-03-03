@@ -3,7 +3,7 @@ package vaporwaveRun;
 import processing.core.PApplet;
 
 public class Main extends PApplet{
-	
+	//Camilo Jose Montoya A. PER - Taller 1 - VaporwaveRun
 	private Logica log;
 	
 	public static void main(String[] args) {
