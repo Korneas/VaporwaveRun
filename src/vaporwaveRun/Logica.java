@@ -269,7 +269,7 @@ public class Logica implements Observer {
 				}
 
 				if (cambiarPantalla && pantalla == 1) {
-					pantalla = 3;
+					pantalla = 2;
 					cambiarPantalla = false;
 					time.empezar();
 					Thread nt = new Thread(cR);
