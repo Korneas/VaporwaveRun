@@ -13,16 +13,24 @@ public class Logica implements Observer {
 
 	private PApplet app;
 	private Comunicacion c;
+	private ConectadosRed cR;
+	private Tiempo time;
+
 	private int pantalla;
 	private boolean cambiarPantalla;
 
-	private PImage logo, fondoM, fondoG;
+	private PImage logo, fondoM, fondoG, fondoFinal;
 	private float xFondoM, xFondoM2, xFondoG, xFondoG2;
 	private PFont texto;
+
+	private Astronauta as;
 
 	private PImage[] elementos;
 
 	private ArrayList<Elemento> elem;
+
+	private int puntuacion, al;
+	private boolean end, alOn;
 
 	public Logica(PApplet app) {
 		this.app = app;
@@ -33,16 +41,23 @@ public class Logica implements Observer {
 
 		c.addObserver(this);
 
+		cR = new ConectadosRed();
+		cR.addObserver(this);
+
+		time = new Tiempo(app);
+
 		logo = app.loadImage("data/VaporwaveLet.png");
-
 		fondoM = app.loadImage("data/montana.png");
-
 		fondoG = app.loadImage("data/neogalaxy.jpg");
+		fondoFinal = app.loadImage("data/FondoFinal.png");
 
 		texto = app.loadFont("data/Pixeled-24.vlw");
 
 		xFondoM2 = 2127;
 		xFondoG2 = 2137;
+		al = 256;
+
+		as = new Astronauta(app, app.loadImage("data/Personaje.png"));
 
 		elementos = new PImage[3];
 
@@ -51,8 +66,6 @@ public class Logica implements Observer {
 		elementos[2] = app.loadImage("data/Windows.png");
 
 		elem = new ArrayList<Elemento>();
-
-		elem.add(new Arizona(app, elementos[0]));
 	}
 
 	public void pintar() {
@@ -62,6 +75,20 @@ public class Logica implements Observer {
 
 		if (app.frameCount % 60 == 0) {
 			cambiarPantalla = true;
+		}
+
+		if (pantalla < 2) {
+			if (al < 0) {
+				alOn = true;
+			} else if (al > 255) {
+				alOn = false;
+			}
+
+			if (alOn) {
+				al += 5;
+			} else if (!alOn) {
+				al -= 5;
+			}
 		}
 
 		switch (pantalla) {
@@ -109,6 +136,9 @@ public class Logica implements Observer {
 		app.imageMode(0);
 		app.image(fondoG, xFondoM, 0);
 		app.image(fondoG, xFondoM2, 0);
+		if (pantalla == 3) {
+			app.image(fondoFinal, 0, 0);
+		}
 		app.image(fondoM, xFondoG, 0);
 		app.image(fondoM, xFondoG2, 0);
 	}
@@ -117,21 +147,76 @@ public class Logica implements Observer {
 		app.imageMode(3);
 		app.image(logo, 500, 350);
 
-		app.fill(255);
+		app.tint(255, al);
+		app.fill(50, 0, 100);
 		app.textAlign(PApplet.RIGHT);
 		app.textFont(texto);
 		app.text("Presione -Espacio-\n para empezar", 970, 650);
+		app.tint(255);
 	}
 
 	private void instrucciones() {
-
+		app.tint(255, al);
+		app.fill(50, 0, 100);
+		app.textAlign(PApplet.RIGHT);
+		app.textFont(texto);
+		app.text("Presione -Espacio-\n para continuar", 970, 650);
+		app.tint(255);
 	}
 
 	private void game() {
-		for (int i = 0; i < elem.size(); i++) {
-			elem.get(i).pintar();
-			elem.get(i).mover();
+		app.fill(255);
+		app.noStroke();
+		app.ellipse(500, 0, 200, 200);
+		app.fill(50, 0, 100);
+		app.textAlign(PApplet.CENTER);
+		app.textFont(texto);
+		app.textSize(16);
+		app.text("Puntuacion\n" + puntuacion, 500, 50);
+		
+		app.textAlign(PApplet.LEFT);
+		app.textSize(24);
+		app.text(PApplet.nf(time.minute(),1)+":"+PApplet.nf(time.second(),2), 900, 50);
+
+		if (elem.size() > 0) {
+			for (int i = 0; i < elem.size(); i++) {
+				elem.get(i).pintar();
+				elem.get(i).mover();
+
+				if (elem.get(i).colision(as.getX(),as.getY())) {
+					if (elem.get(i) instanceof Arizona) {
+						puntuacion += 200;
+						elem.remove(i);
+					}
+
+					if (elem.get(i) instanceof Gameboy) {
+						puntuacion -= 150;
+						elem.remove(i);
+					}
+
+					if (elem.get(i) instanceof Windows) {
+						puntuacion -= 500;
+						elem.remove(i);
+					}
+				}
+				
+				if(elem.get(i).getX()<-100){
+					elem.remove(i);
+				}
+			}
 		}
+
+		as.pintar();
+		as.mover();
+
+		if (app.frameCount % 5 == 0) {
+			puntuacion++;
+		}
+
+		if (time.minute() >= 1) {
+			pantalla = 3;
+		}
+
 	}
 
 	private void resultados() {
@@ -140,7 +225,6 @@ public class Logica implements Observer {
 
 	public void tecla() {
 		if (app.keyPressed) {
-			System.out.println(pantalla);
 			if (app.key == ' ') {
 				if (cambiarPantalla && pantalla == 0) {
 					pantalla = 1;
@@ -150,6 +234,9 @@ public class Logica implements Observer {
 				if (cambiarPantalla && pantalla == 1) {
 					pantalla = 2;
 					cambiarPantalla = false;
+					time.empezar();
+					Thread nt = new Thread(cR);
+					nt.start();
 				}
 			}
 		}
@@ -158,7 +245,8 @@ public class Logica implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		if (arg instanceof String) {
-			if (((String) arg).contains("\\.")) {
+			String msg = (String) arg;
+			if (msg.contains(".")) {
 				int r = (int) app.random(3);
 
 				switch (r) {
@@ -176,7 +264,12 @@ public class Logica implements Observer {
 		}
 
 		if (arg instanceof Movement) {
-			System.out.println("Me llego el mover");
+			Movement mov = (Movement) arg;
+			if (mov.getContenido().contains("up")) {
+				as.setY(as.getY()-5);
+			} else if (mov.getContenido().contains("down")) {
+				as.setY(as.getY()+5);
+			}
 		}
 	}
 }

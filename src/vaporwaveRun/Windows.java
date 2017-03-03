@@ -2,6 +2,7 @@ package vaporwaveRun;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.core.PVector;
 
 public class Windows extends Elemento{
 
@@ -11,7 +12,7 @@ public class Windows extends Elemento{
 
 	@Override
 	public void mover() {
-		
+		x -= vel;
 	}
 
 }

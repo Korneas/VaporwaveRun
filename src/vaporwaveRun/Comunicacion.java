@@ -140,34 +140,6 @@ public class Comunicacion extends Observable implements Runnable {
 		}
 	}
 
-	public void conectadosRed() {
-
-		InetAddress local;
-		try {
-			local = InetAddress.getLocalHost();
-			String hostIP = local.getHostAddress();
-			String[] hosting = hostIP.split("\\.");
-			hostIP = hosting[0] + "." + hosting[1] + "." + hosting[2];
-
-			int espera = 350;
-
-			for (int i = 1; i < 255; i++) {
-				String host = hostIP + "." + i;
-				if (InetAddress.getByName(host).isReachable(espera)) {
-					System.out.println(host + " es alcanzable");
-					
-					setChanged();
-					notifyObservers(host);
-					clearChanged();
-				}
-			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public int getId() {
 		return id;
 	}

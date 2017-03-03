@@ -13,8 +13,6 @@ public class Arizona extends Elemento {
 
 	@Override
 	public void mover() {
-		PVector dir = new PVector(pos.x+1,0);
-		dir.normalize();
-		pos.add(dir);
+		x -= vel;
 	}
 }

@@ -2,6 +2,7 @@ package vaporwaveRun;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.core.PVector;
 
 public class Gameboy extends Elemento{
 
@@ -11,7 +12,7 @@ public class Gameboy extends Elemento{
 
 	@Override
 	public void mover() {
-		
+		x -= vel;
 	}
 
 }
